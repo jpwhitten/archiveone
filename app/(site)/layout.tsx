@@ -9,7 +9,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <WishlistProvider>
         <Nav />
         <CartDrawer />
-        <main className="pt-20">{children}</main>
+        <main className="pt-24">{children}</main>
       </WishlistProvider>
     </CartProvider>
   )
