@@ -1,10 +1,13 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 
 export const photo = defineType({
   name: 'photo',
   title: 'Photo',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: 'photo' }),
     defineField({
       name: 'title',
       type: 'string',

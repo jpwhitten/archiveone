@@ -11,26 +11,26 @@ const photoFields = groq`
 
 export async function getFeaturedPhotos(): Promise<Photo[]> {
   return sanityClient.fetch(
-    groq`*[_type == "photo" && featured == true] | order(_createdAt desc) [0...20] { ${photoFields} }`
+    groq`*[_type == "photo" && featured == true] | order(orderRank) [0...20] { ${photoFields} }`
   )
 }
 
 export async function getAllPhotos(): Promise<Photo[]> {
   return sanityClient.fetch(
-    groq`*[_type == "photo"] | order(_createdAt desc) { ${photoFields} }`
+    groq`*[_type == "photo"] | order(orderRank) { ${photoFields} }`
   )
 }
 
 export async function getPhotosByCollection(collectionSlug: string): Promise<Photo[]> {
   return sanityClient.fetch(
-    groq`*[_type == "photo" && $slug in collections[]->slug.current] | order(_createdAt desc) { ${photoFields} }`,
+    groq`*[_type == "photo" && $slug in collections[]->slug.current] | order(orderRank) { ${photoFields} }`,
     { slug: collectionSlug }
   )
 }
 
 export async function getShopPhotos(): Promise<Photo[]> {
   return sanityClient.fetch(
-    groq`*[_type == "photo" && forSale == true] | order(_createdAt desc) { ${photoFields} }`
+    groq`*[_type == "photo" && forSale == true] | order(orderRank) { ${photoFields} }`
   )
 }
 
