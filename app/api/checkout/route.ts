@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { sanityClient } from '@/lib/sanity/client'
 import { groq } from 'next-sanity'
 import type { CartItem } from '@/lib/types'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   const { items }: { items: CartItem[] } = await req.json()
@@ -10,6 +12,8 @@ export async function POST(req: Request) {
   if (!items || items.length === 0) {
     return NextResponse.json({ error: 'No items' }, { status: 400 })
   }
+
+  const stripe = getStripe()
 
   // Check edition availability server-side before creating session
   for (const item of items) {

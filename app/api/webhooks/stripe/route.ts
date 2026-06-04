@@ -1,14 +1,16 @@
 import { headers } from 'next/headers'
 import Stripe from 'stripe'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { sanityWriteClient, sanityClient } from '@/lib/sanity/client'
 import { getProviderForCountry } from '@/lib/order-routing'
 import { Resend } from 'resend'
 import { groq } from 'next-sanity'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
+  const stripe = getStripe()
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const body = await req.text()
   const sig = (await headers()).get('stripe-signature')!
 
