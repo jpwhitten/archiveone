@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCart } from '@/components/cart/CartContext'
 
 export default function Nav() {
@@ -9,13 +10,25 @@ export default function Nav() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 bg-paper/95 backdrop-blur-sm">
-      <Link href="/" className="flex items-center gap-3">
-        {/* Double-square logo */}
-        <div className="relative w-9 h-9">
-          <div className="absolute inset-0 border border-ink" />
-          <div className="absolute inset-1 border border-ink" />
-        </div>
-        <span className="text-sm tracking-display font-sans uppercase">Archive Nº1</span>
+      <Link href="/" className="flex items-center" aria-label="Archive Nº1 — home">
+        {/* Full lockup on desktop */}
+        <Image
+          src="/Archive1-logo.png"
+          alt="Archive Nº1"
+          width={800}
+          height={200}
+          priority
+          className="hidden md:block h-8 w-auto"
+        />
+        {/* Square mark on mobile */}
+        <Image
+          src="/Archive1-logo-mobile.png"
+          alt="Archive Nº1"
+          width={200}
+          height={200}
+          priority
+          className="md:hidden h-8 w-auto"
+        />
       </Link>
 
       <nav className="hidden md:flex items-center gap-8 text-sm">
