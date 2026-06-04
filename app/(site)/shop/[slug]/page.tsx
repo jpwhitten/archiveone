@@ -45,6 +45,7 @@ export default async function PrintPage({ params }: Props) {
               src={mainSrc}
               alt={photo.title}
               fill
+              quality={95}
               className="object-cover"
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"

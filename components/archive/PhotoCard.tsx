@@ -20,6 +20,7 @@ export default function PhotoCard({ photo, href, priority = false }: Props) {
           alt={photo.title}
           width={1400}
           height={0}
+          quality={95}
           sizes="(max-width: 768px) 100vw, 50vw"
           className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
           priority={priority}

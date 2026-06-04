@@ -20,6 +20,7 @@ export default function ProductCard({ photo, priority = false }: Props) {
           src={src}
           alt={photo.title}
           fill
+          quality={95}
           sizes="(max-width: 768px) 50vw, 33vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           priority={priority}

@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.sanity.io',
       },
     ],
+    qualities: [75, 90, 95],
+    formats: ['image/avif', 'image/webp'],
   },
 }
 
