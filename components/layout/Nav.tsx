@@ -27,6 +27,7 @@ export default function Nav() {
           width={800}
           height={200}
           priority
+          unoptimized
           className="hidden md:block h-11 w-auto"
         />
         {/* Square mark on mobile */}
@@ -36,6 +37,7 @@ export default function Nav() {
           width={200}
           height={200}
           priority
+          unoptimized
           className="md:hidden h-11 w-auto"
         />
       </Link>
