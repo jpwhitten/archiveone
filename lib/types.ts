@@ -46,6 +46,7 @@ export interface CartItem {
   frame: PrintVariant['frame']
   price: number
   stripePriceId: string
+  quantity: number
 }
 
 export function cartItemKey(item: Pick<CartItem, 'photoId' | 'size' | 'frame'>): string {

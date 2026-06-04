@@ -36,6 +36,7 @@ export default function PrintSelector({ photo }: Props) {
       frame,
       price: variant.price,
       stripePriceId: variant.stripePriceId,
+      quantity: 1,
     })
     openCart()
   }
@@ -91,10 +92,10 @@ export default function PrintSelector({ photo }: Props) {
 
       <button
         onClick={handleAddToCart}
-        disabled={!variant || isSoldOut || inCart}
+        disabled={!variant || isSoldOut}
         className="w-full py-4 text-sm font-mono tracking-widest uppercase bg-ink text-paper hover:bg-ink/80 disabled:bg-ink/20 disabled:cursor-not-allowed transition-colors"
       >
-        {isSoldOut ? 'Sold Out' : inCart ? 'In Cart' : 'Add to Cart'}
+        {isSoldOut ? 'Sold Out' : inCart ? 'Add Another' : 'Add to Cart'}
       </button>
     </div>
   )

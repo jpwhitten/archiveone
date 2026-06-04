@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     mode: 'payment',
     line_items: items.map(item => ({
       price: item.stripePriceId,
-      quantity: 1,
+      quantity: item.quantity > 0 ? item.quantity : 1,
     })),
     shipping_address_collection: {
       allowed_countries: [

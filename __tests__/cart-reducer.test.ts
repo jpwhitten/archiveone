@@ -10,17 +10,30 @@ const item: CartItem = {
   frame: 'Black',
   price: 4500,
   stripePriceId: 'price_test',
+  quantity: 1,
 }
 
-test('adds item to empty cart', () => {
+test('adds item to empty cart with quantity 1', () => {
   const state = cartReducer({ items: [] }, { type: 'ADD_ITEM', item })
   expect(state.items).toHaveLength(1)
   expect(state.items[0].photoId).toBe('photo-1')
+  expect(state.items[0].quantity).toBe(1)
 })
 
-test('does not add duplicate item', () => {
+test('adding a duplicate increments quantity instead of duplicating', () => {
   const state = cartReducer({ items: [item] }, { type: 'ADD_ITEM', item })
   expect(state.items).toHaveLength(1)
+  expect(state.items[0].quantity).toBe(2)
+})
+
+test('sets quantity for an item', () => {
+  const state = cartReducer({ items: [item] }, { type: 'SET_QUANTITY', key: 'photo-1-A3-Black', quantity: 4 })
+  expect(state.items[0].quantity).toBe(4)
+})
+
+test('setting quantity to 0 removes the item', () => {
+  const state = cartReducer({ items: [item] }, { type: 'SET_QUANTITY', key: 'photo-1-A3-Black', quantity: 0 })
+  expect(state.items).toHaveLength(0)
 })
 
 test('removes item by key', () => {

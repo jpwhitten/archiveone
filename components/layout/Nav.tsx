@@ -23,8 +23,7 @@ function CartIcon() {
 }
 
 export default function Nav() {
-  const { items, openCart } = useCart()
-  const count = items.length
+  const { count, openCart } = useCart()
   const [menuOpen, setMenuOpen] = useState(false)
 
   // Lock body scroll while the mobile menu is open

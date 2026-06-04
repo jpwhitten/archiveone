@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     )
 
     if (photo?._id && photo.editionSize != null) {
-      await sanityWriteClient.patch(photo._id).inc({ editionSold: 1 }).commit()
+      await sanityWriteClient.patch(photo._id).inc({ editionSold: item.quantity ?? 1 }).commit()
     }
   }
 
@@ -61,7 +61,8 @@ export async function POST(req: Request) {
 
   const itemLines = lineItems.data.map(item => {
     const description = item.description ?? item.price?.id ?? 'Unknown item'
-    return `  → ${description}`
+    const qty = item.quantity ?? 1
+    return `  → ${description}${qty > 1 ? ` × ${qty}` : ''}`
   }).join('\n')
 
   const emailHtml = `
