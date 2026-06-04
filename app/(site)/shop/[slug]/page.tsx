@@ -39,20 +39,22 @@ export default async function PrintPage({ params }: Props) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
       <div className="relative bg-mist">
-        <div className="sticky top-20">
-          <div className="relative aspect-[4/5] w-full">
+        <div className="sticky top-20 p-6 lg:p-12">
+          <div className="relative w-full">
             <Image
               src={mainSrc}
               alt={photo.title}
-              fill
+              width={1800}
+              height={0}
               quality={95}
-              className="object-cover"
+              className="w-full h-auto"
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
+              style={{ height: 'auto' }}
             />
-          </div>
-          <div className="absolute top-4 right-4">
-            <WishlistButton photoId={photo._id} photoSlug={photo.slug.current} />
+            <div className="absolute top-4 right-4">
+              <WishlistButton photoId={photo._id} photoSlug={photo.slug.current} />
+            </div>
           </div>
         </div>
 
