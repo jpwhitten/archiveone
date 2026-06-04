@@ -28,7 +28,7 @@ export default function Nav() {
           height={200}
           priority
           unoptimized
-          className="hidden md:block h-11 w-auto"
+          className="hidden md:block h-[66px] w-auto"
         />
         {/* Square mark on mobile */}
         <Image
@@ -38,7 +38,7 @@ export default function Nav() {
           height={200}
           priority
           unoptimized
-          className="md:hidden h-11 w-auto"
+          className="md:hidden h-[66px] w-auto"
         />
       </Link>
 
