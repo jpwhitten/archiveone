@@ -8,9 +8,22 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Archive Nº1',
+  title: {
+    default: 'Archive Nº1',
+    template: '%s — Archive Nº1',
+  },
   description: 'Curated photographic works, printed to archival standards.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://archiveone.studio'),
+  openGraph: {
+    title: 'Archive Nº1',
+    description: 'Curated photographic works, printed to archival standards.',
+    images: ['/og-default.jpg'],
+    siteName: 'Archive Nº1',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
