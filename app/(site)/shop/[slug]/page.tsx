@@ -13,7 +13,7 @@ export const revalidate = 60
 
 export async function generateStaticParams() {
   const photos = await getAllPhotos()
-  return photos.filter(p => p.forSale).map(p => ({ slug: p.slug.current }))
+  return photos.map(p => ({ slug: p.slug.current }))
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -32,8 +32,9 @@ export default async function PrintPage({ params }: Props) {
   const { slug } = await params
   const photo = await getPhotoBySlug(slug)
 
-  if (!photo || !photo.forSale) notFound()
+  if (!photo) notFound()
 
+  const isForSale = photo.forSale && (photo.variants?.length ?? 0) > 0
   const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
 
   return (
@@ -89,7 +90,13 @@ export default async function PrintPage({ params }: Props) {
           )}
         </div>
 
-        <PrintSelector photo={photo} />
+        {isForSale ? (
+          <PrintSelector photo={photo} />
+        ) : (
+          <p className="text-sm font-mono text-ink/40 border-t border-ink/10 pt-6">
+            Not currently available as a print.
+          </p>
+        )}
       </div>
     </div>
   )

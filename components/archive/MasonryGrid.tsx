@@ -6,7 +6,7 @@ interface Props {
   linkPrefix?: string
 }
 
-export default function MasonryGrid({ photos, linkPrefix = '/archive' }: Props) {
+export default function MasonryGrid({ photos, linkPrefix = '/shop' }: Props) {
   return (
     <div className="masonry">
       {photos.map((photo, i) => (
