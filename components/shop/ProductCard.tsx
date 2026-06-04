@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function ProductCard({ photo, priority = false }: Props) {
-  const src = urlFor(photo.image).width(600).height(600).fit('crop').auto('format').url()
+  const src = urlFor(photo.image).width(1000).height(1000).fit('crop').quality(90).auto('format').url()
   const lowestPrice = photo.variants?.reduce((min, v) => Math.min(min, v.price), Infinity) ?? 0
   const isSoldOut = photo.editionSize != null && photo.editionSold >= photo.editionSize
 

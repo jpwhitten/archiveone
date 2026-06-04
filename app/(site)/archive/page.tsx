@@ -3,6 +3,8 @@ import MasonryGrid from '@/components/archive/MasonryGrid'
 
 export const metadata = { title: 'The Archive — Archive Nº1' }
 
+export const revalidate = 60
+
 export default async function ArchivePage() {
   const photos = await getAllPhotos()
 

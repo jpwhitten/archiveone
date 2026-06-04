@@ -9,6 +9,8 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const photos = await getAllPhotos()
   return photos.filter(p => p.forSale).map(p => ({ slug: p.slug.current }))
@@ -32,7 +34,7 @@ export default async function PrintPage({ params }: Props) {
 
   if (!photo || !photo.forSale) notFound()
 
-  const mainSrc = urlFor(photo.image).width(1200).auto('format').url()
+  const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">

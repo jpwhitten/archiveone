@@ -6,6 +6,8 @@ interface Props {
   params: Promise<{ collection: string }>
 }
 
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const collections = await getAllCollections()
   return collections.map(c => ({ collection: c.slug.current }))

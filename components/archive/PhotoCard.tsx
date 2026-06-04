@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function PhotoCard({ photo, href, priority = false }: Props) {
-  const src = urlFor(photo.image).width(800).auto('format').url()
+  const src = urlFor(photo.image).width(1400).quality(90).auto('format').url()
 
   return (
     <Link href={href} className="group masonry-item block overflow-hidden">
@@ -18,7 +18,7 @@ export default function PhotoCard({ photo, href, priority = false }: Props) {
         <Image
           src={src}
           alt={photo.title}
-          width={800}
+          width={1400}
           height={0}
           sizes="(max-width: 768px) 100vw, 50vw"
           className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
