@@ -12,6 +12,16 @@ const LINKS = [
   { href: '/about', label: 'About' },
 ]
 
+function CartIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  )
+}
+
 export default function Nav() {
   const { items, openCart } = useCart()
   const count = items.length
@@ -55,15 +65,29 @@ export default function Nav() {
             {link.label}
           </Link>
         ))}
-        <button onClick={openCart} className="hover:opacity-50 transition-opacity">
-          Cart{count > 0 && <span className="ml-1 font-mono">({count})</span>}
+        <button
+          onClick={openCart}
+          className="relative hover:opacity-50 transition-opacity"
+          aria-label={`Open cart${count > 0 ? `, ${count} items` : ''}`}
+        >
+          <CartIcon />
+          {count > 0 && (
+            <span className="absolute -top-2 -right-2.5 text-[10px] font-mono leading-none">{count}</span>
+          )}
         </button>
       </nav>
 
       {/* Mobile controls */}
       <div className="flex md:hidden items-center gap-5">
-        <button onClick={openCart} className="text-sm" aria-label="Open cart">
-          Cart{count > 0 && <span className="ml-1 font-mono">({count})</span>}
+        <button
+          onClick={openCart}
+          className="relative"
+          aria-label={`Open cart${count > 0 ? `, ${count} items` : ''}`}
+        >
+          <CartIcon />
+          {count > 0 && (
+            <span className="absolute -top-2 -right-2.5 text-[10px] font-mono leading-none">{count}</span>
+          )}
         </button>
         <button
           onClick={() => setMenuOpen(true)}
