@@ -42,7 +42,7 @@ export default function PrintSelector({ photo }: Props) {
 
   return (
     <div className="space-y-8">
-      <FramePreview image={photo.image} size={size} frame={frame} />
+      <FramePreview image={photo.image} size={size} frame={frame} aspectRatio={photo.imageAspectRatio} />
 
       <div>
         <p className="text-xs font-mono tracking-widest uppercase text-ink/40 mb-3">Size</p>
