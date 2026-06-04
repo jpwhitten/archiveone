@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useReducer, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import type { CartItem } from '@/lib/types'
 import { cartItemKey } from '@/lib/types'
 
@@ -40,7 +40,7 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
     case 'REMOVE_ITEM':
       return { items: state.items.filter(i => cartItemKey(i) !== action.key) }
     case 'CLEAR':
-      return { items: [] }
+      return state.items.length === 0 ? state : { items: [] }
     default:
       return state
   }
@@ -88,22 +88,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const total = state.items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const count = state.items.reduce((sum, i) => sum + i.quantity, 0)
 
-  return (
-    <CartContext.Provider value={{
-      items: state.items,
-      isOpen,
-      openCart: () => setIsOpen(true),
-      closeCart: () => setIsOpen(false),
-      addItem: item => dispatch({ type: 'ADD_ITEM', item }),
-      setQuantity: (key, quantity) => dispatch({ type: 'SET_QUANTITY', key, quantity }),
-      removeItem: key => dispatch({ type: 'REMOVE_ITEM', key }),
-      clearCart: () => dispatch({ type: 'CLEAR' }),
-      total,
-      count,
-    }}>
-      {children}
-    </CartContext.Provider>
+  const openCart = useCallback(() => setIsOpen(true), [])
+  const closeCart = useCallback(() => setIsOpen(false), [])
+  const addItem = useCallback((item: CartItem) => dispatch({ type: 'ADD_ITEM', item }), [])
+  const setQuantity = useCallback((key: string, quantity: number) => dispatch({ type: 'SET_QUANTITY', key, quantity }), [])
+  const removeItem = useCallback((key: string) => dispatch({ type: 'REMOVE_ITEM', key }), [])
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), [])
+
+  const value = useMemo(
+    () => ({ items: state.items, isOpen, openCart, closeCart, addItem, setQuantity, removeItem, clearCart, total, count }),
+    [state.items, isOpen, openCart, closeCart, addItem, setQuantity, removeItem, clearCart, total, count]
   )
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
 export function useCart() {
