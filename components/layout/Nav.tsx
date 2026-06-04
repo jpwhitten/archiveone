@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/components/cart/CartContext'
@@ -17,8 +17,14 @@ export default function Nav() {
   const count = items.length
   const [menuOpen, setMenuOpen] = useState(false)
 
+  // Lock body scroll while the mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 bg-paper/95 backdrop-blur-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 bg-paper">
       <Link href="/" className="flex items-center" aria-label="Archive Nº1 — home">
         {/* Full lockup on desktop */}
         <Image
@@ -38,7 +44,7 @@ export default function Nav() {
           height={200}
           priority
           unoptimized
-          className="md:hidden h-[66px] w-auto"
+          className="md:hidden h-11 w-auto"
         />
       </Link>
 
@@ -72,13 +78,14 @@ export default function Nav() {
 
       {/* Mobile menu overlay */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-paper flex flex-col md:hidden">
+        <div className="fixed inset-0 z-[60] bg-paper flex flex-col md:hidden">
           <div className="flex items-center justify-between px-6 py-5">
             <Image
               src="/Archive1-logo-mobile.png"
               alt="Archive Nº1"
               width={200}
               height={200}
+              unoptimized
               className="h-11 w-auto"
             />
             <button
