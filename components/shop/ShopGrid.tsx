@@ -11,11 +11,9 @@ export default function ShopGrid({ photos }: { photos: Photo[] }) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-ink/5">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10 px-6 pb-16">
       {photos.map((photo, i) => (
-        <div key={photo._id} className="bg-paper p-4">
-          <ProductCard photo={photo} priority={i < 6} />
-        </div>
+        <ProductCard key={photo._id} photo={photo} priority={i < 6} />
       ))}
     </div>
   )
