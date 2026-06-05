@@ -128,19 +128,65 @@ export async function POST(req: Request) {
   <div style="max-width:600px;margin:14px auto 0;${label};text-align:center">Archive Nº1 · archiveone.studio</div>
 </div>`
 
-  // Email is best-effort: the order has already been processed, so a Resend
-  // failure must not fail the webhook (which would make Stripe retry forever).
+  // Customer-facing confirmation email.
+  const firstName = customerName.split(' ')[0] || 'there'
+  const customerHtml = `
+<div style="background:#f5f5f5;padding:32px 16px;font:15px -apple-system,Segoe UI,sans-serif;color:#0a0a0a">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #eaeaea">
+    <tr><td style="padding:36px 32px 8px;text-align:center">
+      <div style="font:13px ui-monospace,Menlo,monospace;letter-spacing:3px;text-transform:uppercase">Archive Nº1</div>
+      <div style="font:24px -apple-system,Segoe UI,sans-serif;margin-top:22px">Thank you, ${firstName}</div>
+      <div style="${label};margin-top:8px">Order ${orderRef} · ${total}</div>
+    </td></tr>
+
+    <tr><td style="padding:18px 32px 8px">
+      <div style="font:15px -apple-system,Segoe UI,sans-serif;line-height:1.65;color:#444;text-align:center">
+        Your order has been received. Each print is made to order on archival fine-art paper and dispatched individually — expect a shipping notification within 3–5 business days.
+      </div>
+    </td></tr>
+
+    <tr><td style="padding:28px 32px 8px">
+      <div style="${label}">Your order</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:6px">${itemRows}</table>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td style="padding:16px 0 0;font:13px ui-monospace,Menlo,monospace;color:#666">Total</td>
+        <td style="padding:16px 0 0;text-align:right;font:14px ui-monospace,Menlo,monospace">${total}</td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:24px 32px 36px">
+      <div style="${label}">Shipping to</div>
+      <div style="font:15px -apple-system,Segoe UI,sans-serif;line-height:1.5;margin-top:8px">
+        <strong>${customerName}</strong><br>${addressLines.join('<br>')}
+      </div>
+    </td></tr>
+  </table>
+  <div style="max-width:600px;margin:14px auto 0;${label};text-align:center">Questions? Reply to this email · archiveone.studio</div>
+</div>`
+
+  // Emails are best-effort: the order is already processed, so a Resend failure
+  // must not fail the webhook (which would make Stripe retry forever).
   try {
     if (process.env.RESEND_API_KEY && process.env.OWNER_EMAIL) {
       const resend = new Resend(process.env.RESEND_API_KEY)
+      // Owner / fulfilment notification (works with the no-setup sender).
+      const fromOwner = process.env.ORDER_EMAIL_FROM || 'Archive One <onboarding@resend.dev>'
       await resend.emails.send({
-        // Defaults to Resend's no-setup sender (works when emailing yourself).
-        // Set ORDER_EMAIL_FROM to a verified domain address once verified.
-        from: process.env.ORDER_EMAIL_FROM || 'Archive One <onboarding@resend.dev>',
+        from: fromOwner,
         to: process.env.OWNER_EMAIL,
         subject: `New Order — ${customerName} · ${city}, ${country}`,
         html: emailHtml,
       })
+      // Customer confirmation — only once a verified domain sender is set,
+      // since onboarding@resend.dev can't email external recipients.
+      if (process.env.ORDER_EMAIL_FROM && customerEmail) {
+        await resend.emails.send({
+          from: process.env.ORDER_EMAIL_FROM,
+          to: customerEmail,
+          subject: `Your Archive Nº1 order — ${orderRef}`,
+          html: customerHtml,
+        })
+      }
     }
   } catch (err) {
     console.error('Order email failed to send:', err)
