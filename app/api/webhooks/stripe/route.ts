@@ -10,13 +10,17 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   const stripe = getStripe()
-  const resend = new Resend(process.env.RESEND_API_KEY)
   const body = await req.text()
-  const sig = (await headers()).get('stripe-signature')!
+  const sig = (await headers()).get('stripe-signature')
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!webhookSecret || !sig) {
+    return new Response('Webhook not configured', { status: 400 })
+  }
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
   } catch {
     return new Response('Webhook signature verification failed', { status: 400 })
   }
@@ -76,6 +80,7 @@ export async function POST(req: Request) {
     <p><strong>Total charged:</strong> ${total}</p>
   `
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   await resend.emails.send({
     // Defaults to Resend's no-setup sender (works when emailing yourself).
     // Set ORDER_EMAIL_FROM to a verified domain address (e.g. orders@archiveone.studio) once verified.
