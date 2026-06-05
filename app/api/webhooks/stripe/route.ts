@@ -77,7 +77,9 @@ export async function POST(req: Request) {
   `
 
   await resend.emails.send({
-    from: 'orders@archiveone.studio',
+    // Defaults to Resend's no-setup sender (works when emailing yourself).
+    // Set ORDER_EMAIL_FROM to a verified domain address (e.g. orders@archiveone.studio) once verified.
+    from: process.env.ORDER_EMAIL_FROM || 'Archive One <onboarding@resend.dev>',
     to: process.env.OWNER_EMAIL!,
     subject: `New Order — ${customerName} · ${city}, ${country}`,
     html: emailHtml,
