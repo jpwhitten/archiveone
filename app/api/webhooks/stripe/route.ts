@@ -80,15 +80,23 @@ export async function POST(req: Request) {
     <p><strong>Total charged:</strong> ${total}</p>
   `
 
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  await resend.emails.send({
-    // Defaults to Resend's no-setup sender (works when emailing yourself).
-    // Set ORDER_EMAIL_FROM to a verified domain address (e.g. orders@archiveone.studio) once verified.
-    from: process.env.ORDER_EMAIL_FROM || 'Archive One <onboarding@resend.dev>',
-    to: process.env.OWNER_EMAIL!,
-    subject: `New Order — ${customerName} · ${city}, ${country}`,
-    html: emailHtml,
-  })
+  // Email is best-effort: the order has already been processed, so a Resend
+  // failure must not fail the webhook (which would make Stripe retry forever).
+  try {
+    if (process.env.RESEND_API_KEY && process.env.OWNER_EMAIL) {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      await resend.emails.send({
+        // Defaults to Resend's no-setup sender (works when emailing yourself).
+        // Set ORDER_EMAIL_FROM to a verified domain address once verified.
+        from: process.env.ORDER_EMAIL_FROM || 'Archive One <onboarding@resend.dev>',
+        to: process.env.OWNER_EMAIL,
+        subject: `New Order — ${customerName} · ${city}, ${country}`,
+        html: emailHtml,
+      })
+    }
+  } catch (err) {
+    console.error('Order email failed to send:', err)
+  }
 
   return new Response(null, { status: 200 })
 }
