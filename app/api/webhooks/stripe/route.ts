@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe'
 import { sanityWriteClient, sanityClient } from '@/lib/sanity/client'
 import { getProviderForCountry } from '@/lib/order-routing'
+import { urlFor } from '@/lib/sanity/image'
 import { Resend } from 'resend'
 import { groq } from 'next-sanity'
 
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
 
   // For each line item: look up the photo + the exact variant (size/frame),
   // increment limited-edition counts, and collect fulfilment details.
-  const fulfilItems: { title: string; size: string; frame: string; qty: number }[] = []
+  const fulfilItems: { title: string; size: string; frame: string; qty: number; imageUrl: string }[] = []
   for (const item of lineItems.data) {
     const priceId = item.price?.id
     const qty = item.quantity ?? 1
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
 
     const photo = await sanityClient.fetch(
       groq`*[_type == "photo" && $priceId in variants[].stripePriceId][0]{
-        _id, title, editionSize, editionSold,
+        _id, title, image, editionSize, editionSold,
         "variant": variants[stripePriceId == $priceId][0]{ size, frame }
       }`,
       { priceId }
@@ -65,6 +66,7 @@ export async function POST(req: Request) {
       size: photo?.variant?.size ?? '',
       frame: photo?.variant?.frame ?? '',
       qty,
+      imageUrl: photo?.image ? urlFor(photo.image).width(120).height(120).fit('crop').format('jpg').url() : '',
     })
   }
 
@@ -85,11 +87,14 @@ export async function POST(req: Request) {
   const label = `font:11px ui-monospace,Menlo,monospace;letter-spacing:1.5px;text-transform:uppercase;color:#9a9a9a`
   const itemRows = fulfilItems.map(i => `
     <tr>
-      <td style="padding:14px 0;border-bottom:1px solid #eee;font:15px -apple-system,Segoe UI,sans-serif;color:#0a0a0a">
+      <td width="60" style="padding:14px 0;border-bottom:1px solid #eee;vertical-align:middle">
+        ${i.imageUrl ? `<img src="${i.imageUrl}" width="48" height="48" alt="" style="display:block;width:48px;height:48px;object-fit:cover;border-radius:2px;background:#f5f5f5">` : ''}
+      </td>
+      <td style="padding:14px 0 14px 14px;border-bottom:1px solid #eee;font:15px -apple-system,Segoe UI,sans-serif;color:#0a0a0a;vertical-align:middle">
         ${i.title}
         <div style="font:13px ui-monospace,Menlo,monospace;color:#666;margin-top:3px">${[i.size, i.frame].filter(Boolean).join(' · ')}</div>
       </td>
-      <td style="padding:14px 0;border-bottom:1px solid #eee;text-align:right;font:14px ui-monospace,Menlo,monospace;color:#0a0a0a;white-space:nowrap">
+      <td style="padding:14px 0;border-bottom:1px solid #eee;text-align:right;font:14px ui-monospace,Menlo,monospace;color:#0a0a0a;white-space:nowrap;vertical-align:middle">
         ${i.qty > 1 ? `×&nbsp;${i.qty}` : '×&nbsp;1'}
       </td>
     </tr>`).join('')
