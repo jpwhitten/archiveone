@@ -1,6 +1,6 @@
 import { groq } from 'next-sanity'
 import { sanityClient } from './client'
-import type { Photo, Collection } from '@/lib/types'
+import type { Photo, Collection, SanityImage } from '@/lib/types'
 
 const photoFields = groq`
   _id, title, slug, image, description, location,
@@ -48,6 +48,25 @@ export async function getAllCollections(): Promise<Collection[]> {
       _id, title, slug, description,
       coverPhoto->{ _id, title, slug, image }
     }`
+  )
+}
+
+export interface ArchiveCollection {
+  _id: string
+  title: string
+  slug: { current: string }
+  description?: string
+  cover?: SanityImage
+  count: number
+}
+
+export async function getArchiveCollections(): Promise<ArchiveCollection[]> {
+  return sanityClient.fetch(
+    groq`*[_type == "collection"]{
+      _id, title, slug, description,
+      "cover": coalesce(coverPhoto->image, *[_type == "photo" && ^._id in collections[]._ref][0].image),
+      "count": count(*[_type == "photo" && ^._id in collections[]._ref])
+    } | order(count desc, title asc)`
   )
 }
 
