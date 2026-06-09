@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { getPhotoBySlug, getAllPhotos } from '@/lib/sanity/queries'
+import { getPhotoBySlug, getAllPhotos, getRelatedPhotos } from '@/lib/sanity/queries'
 import { urlFor } from '@/lib/sanity/image'
 import PrintSelector from '@/components/shop/PrintSelector'
+import SizeGuide from '@/components/shop/SizeGuide'
+import ProductCard from '@/components/shop/ProductCard'
 import WishlistButton from '@/components/wishlist/WishlistButton'
 
 interface Props {
@@ -36,6 +38,10 @@ export default async function PrintPage({ params }: Props) {
 
   const isForSale = photo.forSale && (photo.variants?.length ?? 0) > 0
   const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
+  const related = await getRelatedPhotos(
+    photo._id,
+    photo.collections?.map(c => c.slug.current) ?? []
+  )
 
   const lowestPrice = photo.variants?.reduce((min, v) => Math.min(min, v.price), Infinity)
   const productJsonLd = isForSale && lowestPrice && lowestPrice !== Infinity ? {
@@ -55,13 +61,14 @@ export default async function PrintPage({ params }: Props) {
   } : null
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <>
       {productJsonLd && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
         />
       )}
+    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
       <div className="relative bg-mist">
         <div className="sticky top-20 p-6 lg:p-12">
           <div className="relative w-full">
@@ -114,7 +121,17 @@ export default async function PrintPage({ params }: Props) {
         </div>
 
         {isForSale ? (
-          <PrintSelector photo={photo} />
+          <>
+            <PrintSelector photo={photo} />
+            <details className="mt-8 border-t border-ink/10 pt-6 group">
+              <summary className="text-xs font-mono tracking-widest uppercase text-ink/40 cursor-pointer select-none hover:text-ink transition-colors">
+                Size guide
+              </summary>
+              <div className="mt-5">
+                <SizeGuide />
+              </div>
+            </details>
+          </>
         ) : (
           <p className="text-sm font-mono text-ink/40 border-t border-ink/10 pt-6">
             Not currently available as a print.
@@ -122,5 +139,19 @@ export default async function PrintPage({ params }: Props) {
         )}
       </div>
     </div>
+
+    {related.length > 0 && (
+      <section className="px-6 md:px-12 py-16 border-t border-ink/10">
+        <h2 className="text-xs font-mono tracking-widest uppercase text-ink/40 mb-8">
+          More from this series
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+          {related.map(p => (
+            <ProductCard key={p._id} photo={p} />
+          ))}
+        </div>
+      </section>
+    )}
+    </>
   )
 }

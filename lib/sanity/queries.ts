@@ -42,6 +42,16 @@ export async function getPhotoBySlug(slug: string): Promise<Photo | null> {
   )
 }
 
+export async function getRelatedPhotos(currentId: string, collectionSlugs: string[]): Promise<Photo[]> {
+  if (!collectionSlugs.length) return []
+  return sanityClient.fetch(
+    groq`*[_type == "photo" && forSale == true && _id != $currentId &&
+      count(collections[@->slug.current in $slugs]) > 0]
+      | order(orderRank) [0...4] { ${photoFields} }`,
+    { currentId, slugs: collectionSlugs }
+  )
+}
+
 export async function getAllCollections(): Promise<Collection[]> {
   return sanityClient.fetch(
     groq`*[_type == "collection"] | order(title asc) {
