@@ -7,6 +7,7 @@ import { schemaTypes } from './schema'
 export default defineConfig({
   name: 'archive-one',
   title: 'Archive One',
+  basePath: '/studio',
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   plugins: [
