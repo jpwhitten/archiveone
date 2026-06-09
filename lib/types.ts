@@ -34,7 +34,6 @@ export interface Photo {
   editionSold: number
   variants?: PrintVariant[]
   mockupImages?: SanityImage[]
-  arteloMockups?: SanityImage[]
   imageAspectRatio?: number
   lqip?: string
 }

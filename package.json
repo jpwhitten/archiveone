@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --passWithNoTests",
-    "setup-pricing": "node scripts/setup-print-pricing.mjs",
-    "sync-mockups": "tsx scripts/sync-artelo-mockups.ts"
+    "setup-pricing": "node scripts/setup-print-pricing.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
