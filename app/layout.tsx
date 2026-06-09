@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: '%s — Archive Nº1',
   },
   description: 'Curated photographic works, printed to archival standards.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://archiveone.studio'),
+  metadataBase: new URL('https://www.archiveone.studio'),
   openGraph: {
     title: 'Archive Nº1',
     description: 'Curated photographic works, printed to archival standards.',

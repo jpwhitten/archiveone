@@ -37,8 +37,31 @@ export default async function PrintPage({ params }: Props) {
   const isForSale = photo.forSale && (photo.variants?.length ?? 0) > 0
   const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
 
+  const lowestPrice = photo.variants?.reduce((min, v) => Math.min(min, v.price), Infinity)
+  const productJsonLd = isForSale && lowestPrice && lowestPrice !== Infinity ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: photo.title,
+    image: urlFor(photo.image).width(1200).url(),
+    description: photo.description || `Fine-art print — ${photo.title}`,
+    brand: { '@type': 'Brand', name: 'Archive Nº1' },
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'GBP',
+      lowPrice: (lowestPrice / 100).toFixed(2),
+      availability: 'https://schema.org/InStock',
+      url: `https://www.archiveone.studio/shop/${photo.slug.current}`,
+    },
+  } : null
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+      {productJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
+      )}
       <div className="relative bg-mist">
         <div className="sticky top-20 p-6 lg:p-12">
           <div className="relative w-full">
