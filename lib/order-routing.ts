@@ -5,7 +5,7 @@ export interface Provider {
 }
 
 export const PROVIDERS: Record<'US' | 'UK' | 'AU', Provider> = {
-  US: { region: 'US', name: 'Printful US', url: 'https://printful.com' },
+  US: { region: 'US', name: 'Artelo', url: 'https://artelo.io' },
   UK: { region: 'UK', name: 'Prodigi UK', url: 'https://prodigi.com' },
   AU: { region: 'AU', name: 'Your AU Provider', url: '' },
 }
