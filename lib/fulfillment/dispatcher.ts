@@ -12,6 +12,8 @@ export async function dispatch(
   order: FulfilmentOrder,
   deps: DispatchDeps = {}
 ): Promise<FulfilmentResult> {
+  // Default providers are imported dynamically so the jsdom test environment never loads
+  // 'resend' (which needs TextEncoder) at module-eval time. Injected deps bypass these entirely.
   const artelo = deps.artelo ?? (await import('./artelo')).arteloProvider
   const email = deps.email ?? (await import('./email')).emailProvider
   const arteloEnabled = deps.arteloEnabled ?? process.env.ARTELO_ENABLED === 'true'
