@@ -90,3 +90,13 @@ export async function getCollectionBySlug(slug: string): Promise<Collection | nu
     { slug }
   )
 }
+
+export async function getPrintFileUrlByPriceId(priceId: string): Promise<string | undefined> {
+  const res = await sanityClient.fetch<{ url?: string } | null>(
+    groq`*[_type == "photo" && $priceId in variants[].stripePriceId][0]{
+      "url": printFile.asset->url
+    }`,
+    { priceId }
+  )
+  return res?.url ?? undefined
+}
