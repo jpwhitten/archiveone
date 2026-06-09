@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --passWithNoTests",
-    "setup-pricing": "node scripts/setup-print-pricing.mjs"
+    "setup-pricing": "node scripts/setup-print-pricing.mjs",
+    "sync-mockups": "tsx scripts/sync-artelo-mockups.ts"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
@@ -36,6 +37,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }
