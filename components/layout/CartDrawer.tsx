@@ -4,10 +4,12 @@ import { useEffect } from 'react'
 import { useCart } from '@/components/cart/CartContext'
 import CartItem from '@/components/cart/CartItem'
 import { useRouter } from 'next/navigation'
+import { isSoldOut } from '@/lib/sold-out'
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, total } = useCart()
   const router = useRouter()
+  const soldOut = isSoldOut()
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -15,6 +17,7 @@ export default function CartDrawer() {
   }, [isOpen])
 
   async function handleCheckout() {
+    if (soldOut) return
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,11 +60,14 @@ export default function CartDrawer() {
             </div>
             <button
               onClick={handleCheckout}
-              className="w-full py-4 bg-ink text-paper text-xs font-mono tracking-widest uppercase hover:bg-ink/80 transition-colors"
+              disabled={soldOut}
+              className="w-full py-4 bg-ink text-paper text-xs font-mono tracking-widest uppercase hover:bg-ink/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-ink"
             >
-              Checkout
+              {soldOut ? 'Sold out' : 'Checkout'}
             </button>
-            <p className="text-xs font-mono text-ink/30 text-center mt-3">Secure checkout via Stripe</p>
+            <p className="text-xs font-mono text-ink/30 text-center mt-3">
+              {soldOut ? 'Sold out — checkout is disabled.' : 'Secure checkout via Stripe'}
+            </p>
           </div>
         )}
       </div>

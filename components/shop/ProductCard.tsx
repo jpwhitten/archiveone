@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { urlFor } from '@/lib/sanity/image'
+import { isSoldOut as soldOutMode } from '@/lib/sold-out'
 import type { Photo } from '@/lib/types'
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
 export default function ProductCard({ photo, priority = false }: Props) {
   const src = urlFor(photo.image).width(1000).height(1000).fit('crop').quality(90).auto('format').url()
   const lowestPrice = photo.variants?.reduce((min, v) => Math.min(min, v.price), Infinity) ?? 0
-  const isSoldOut = photo.editionSize != null && photo.editionSold >= photo.editionSize
+  const isSoldOut = soldOutMode() || (photo.editionSize != null && photo.editionSold >= photo.editionSize)
 
   return (
     <Link href={`/shop/${photo.slug.current}`} className="group block">

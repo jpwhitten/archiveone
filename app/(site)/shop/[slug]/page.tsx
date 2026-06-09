@@ -7,6 +7,7 @@ import SizeGuide from '@/components/shop/SizeGuide'
 import ProductCard from '@/components/shop/ProductCard'
 import ZoomableImage from '@/components/shop/ZoomableImage'
 import WishlistButton from '@/components/wishlist/WishlistButton'
+import { isSoldOut } from '@/lib/sold-out'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -37,7 +38,8 @@ export default async function PrintPage({ params }: Props) {
 
   if (!photo) notFound()
 
-  const isForSale = photo.forSale && (photo.variants?.length ?? 0) > 0
+  const soldOut = isSoldOut()
+  const isForSale = !soldOut && photo.forSale && (photo.variants?.length ?? 0) > 0
   const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
   const related = await getRelatedPhotos(
     photo._id,
@@ -130,7 +132,7 @@ export default async function PrintPage({ params }: Props) {
           </>
         ) : (
           <p className="text-sm font-mono text-ink/40 border-t border-ink/10 pt-6">
-            Not currently available as a print.
+            {soldOut ? 'Sold out.' : 'Not currently available as a print.'}
           </p>
         )}
       </div>

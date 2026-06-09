@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { sanityClient } from '@/lib/sanity/client'
 import { groq } from 'next-sanity'
+import { isSoldOut } from '@/lib/sold-out'
 import type { CartItem } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
+  if (isSoldOut()) {
+    return NextResponse.json({ error: 'Everything is currently sold out' }, { status: 409 })
+  }
+
   const { items }: { items: CartItem[] } = await req.json()
 
   if (!items || items.length === 0) {
