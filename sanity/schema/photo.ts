@@ -63,6 +63,12 @@ export const photo = defineType({
       of: [defineArrayMember({ type: 'image', options: { hotspot: true } })],
       description: 'Optional lifestyle photos showing the print in a room',
     }),
+    defineField({
+      name: 'printFile',
+      title: 'Print master (high-res)',
+      type: 'file',
+      description: 'Full-resolution master used for printing. Separate from the web image. Required for automated fulfilment.',
+    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'location', media: 'image' },
