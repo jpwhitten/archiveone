@@ -22,7 +22,50 @@ export const arteloProvider: FulfilmentProvider = {
   async submit(order: FulfilmentOrder): Promise<FulfilmentResult> {
     const reason = unfulfillableReason(order)
     if (reason) return { ok: false, provider: 'artelo', error: reason }
-    // Real Artelo HTTP call added in Task 7.
-    return { ok: false, provider: 'artelo', error: 'Artelo submit not yet implemented' }
+
+    const apiKey = process.env.ARTELO_API_KEY
+    if (!apiKey) return { ok: false, provider: 'artelo', error: 'ARTELO_API_KEY not set' }
+
+    // NOTE: endpoint/headers/body confirmed against Artelo docs before go-live.
+    const items = order.lines.map(line => {
+      const sku = arteloSkuFor(line.size, line.frame)! // guarded by unfulfillableReason
+      return {
+        productId: sku.productId,
+        variantId: sku.variantId,
+        quantity: line.qty,
+        artworkUrl: line.printFileUrl,
+      }
+    })
+
+    const body = {
+      idempotencyKey: order.sessionId,
+      recipient: {
+        name: order.customerName,
+        email: order.customerEmail,
+        address: order.addressLines,
+        country: order.country,
+      },
+      items,
+    }
+
+    try {
+      const res = await fetch('https://api.artelo.io/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Idempotency-Key': order.sessionId,
+        },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        const text = await res.text().catch(() => '')
+        return { ok: false, provider: 'artelo', error: `Artelo ${res.status}: ${text.slice(0, 300)}` }
+      }
+      const data = await res.json().catch(() => ({})) as { id?: string; orderId?: string }
+      return { ok: true, provider: 'artelo', providerOrderId: data.id ?? data.orderId }
+    } catch (err) {
+      return { ok: false, provider: 'artelo', error: String(err) }
+    }
   },
 }
