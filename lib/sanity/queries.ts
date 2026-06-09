@@ -7,6 +7,7 @@ const photoFields = groq`
   featured, forSale, editionSize, editionSold,
   variants, mockupImages,
   "imageAspectRatio": image.asset->metadata.dimensions.aspectRatio,
+  "lqip": image.asset->metadata.lqip,
   "collections": collections[]->{ _id, title, slug }
 `
 

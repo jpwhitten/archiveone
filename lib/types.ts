@@ -35,6 +35,7 @@ export interface Photo {
   variants?: PrintVariant[]
   mockupImages?: SanityImage[]
   imageAspectRatio?: number
+  lqip?: string
 }
 
 export interface CartItem {

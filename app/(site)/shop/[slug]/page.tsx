@@ -5,6 +5,7 @@ import { urlFor } from '@/lib/sanity/image'
 import PrintSelector from '@/components/shop/PrintSelector'
 import SizeGuide from '@/components/shop/SizeGuide'
 import ProductCard from '@/components/shop/ProductCard'
+import ZoomableImage from '@/components/shop/ZoomableImage'
 import WishlistButton from '@/components/wishlist/WishlistButton'
 
 interface Props {
@@ -72,16 +73,11 @@ export default async function PrintPage({ params }: Props) {
       <div className="relative bg-mist">
         <div className="sticky top-20 p-6 lg:p-12">
           <div className="relative w-full">
-            <Image
+            <ZoomableImage
               src={mainSrc}
+              fullSrc={urlFor(photo.image).width(2400).quality(92).url()}
               alt={photo.title}
-              width={1800}
-              height={0}
-              quality={95}
-              className="w-full h-auto"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              style={{ height: 'auto' }}
+              blurDataURL={photo.lqip}
             />
             <div className="absolute top-4 right-4">
               <WishlistButton photoId={photo._id} photoSlug={photo.slug.current} />
