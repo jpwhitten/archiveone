@@ -69,6 +69,13 @@ export const photo = defineType({
       type: 'file',
       description: 'Full-resolution master used for printing. Separate from the web image. Required for automated fulfilment.',
     }),
+    defineField({
+      name: 'arteloMockups',
+      title: 'Artelo mockups (auto-generated)',
+      type: 'array',
+      of: [defineArrayMember({ type: 'image' })],
+      description: 'Managed automatically by the mockup sync script — manual edits are overwritten.',
+    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'location', media: 'image' },

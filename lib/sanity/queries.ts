@@ -5,7 +5,7 @@ import type { Photo, Collection, SanityImage } from '@/lib/types'
 const photoFields = groq`
   _id, title, slug, image, description, location,
   featured, forSale, editionSize, editionSold,
-  variants, mockupImages,
+  variants, mockupImages, arteloMockups,
   "imageAspectRatio": image.asset->metadata.dimensions.aspectRatio,
   "lqip": image.asset->metadata.lqip,
   "collections": collections[]->{ _id, title, slug }
