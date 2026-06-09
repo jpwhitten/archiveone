@@ -85,24 +85,28 @@ export default async function PrintPage({ params }: Props) {
           </div>
         </div>
 
-        {photo.mockupImages && photo.mockupImages.length > 0 && (
-          <div className="grid grid-cols-3 gap-px mt-px">
-            {photo.mockupImages.map((img, i) => {
-              const src = urlFor(img).width(400).height(400).fit('crop').auto('format').url()
-              return (
-                <div key={i} className="relative aspect-square bg-mist">
-                  <Image
-                    src={src}
-                    alt={`${photo.title} room mockup ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                  />
-                </div>
-              )
-            })}
-          </div>
-        )}
+        {(() => {
+          const mockups = [...(photo.arteloMockups ?? []), ...(photo.mockupImages ?? [])]
+          if (mockups.length === 0) return null
+          return (
+            <div className="grid grid-cols-3 gap-px mt-px">
+              {mockups.map((img, i) => {
+                const src = urlFor(img).width(400).height(400).fit('crop').auto('format').url()
+                return (
+                  <div key={i} className="relative aspect-square bg-mist">
+                    <Image
+                      src={src}
+                      alt={`${photo.title} mockup ${i + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="200px"
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
       </div>
 
       <div className="px-8 py-12 lg:px-12">
