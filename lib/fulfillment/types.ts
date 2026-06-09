@@ -7,17 +7,25 @@ export interface FulfilmentLine {
   frame: PrintVariant['frame']
   qty: number
   printFileUrl?: string // full-res master; absent → manual fallback
+  orientation?: 'Vertical' | 'Horizontal' // from the photo's aspect ratio
+  unitPrice?: number // pence
 }
 
 export interface FulfilmentOrder {
   sessionId: string
   region: 'US' | 'UK' | 'AU'
   country: string
+  currency?: string // ISO code, e.g. GBP (defaults to GBP)
   customerName: string
   customerEmail: string
-  shippingAddress: string
+  shippingAddress: string // joined, for the email
   addressLines: string[]
+  // Structured address parts for the Artelo order API:
+  street1?: string
+  street2?: string
   city: string
+  state?: string
+  zipcode?: string
   total: number // pence
   lines: FulfilmentLine[]
 }

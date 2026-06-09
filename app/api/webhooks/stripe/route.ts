@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
   // For each line item: look up the photo + the exact variant (size/frame),
   // increment limited-edition counts, and collect fulfilment details.
-  const fulfilItems: { photoId: string; photoTitle: string; size: string; frame: string; qty: number; imageUrl: string; printFileUrl?: string }[] = []
+  const fulfilItems: { photoId: string; photoTitle: string; size: string; frame: string; qty: number; imageUrl: string; printFileUrl?: string; orientation?: 'Vertical' | 'Horizontal'; unitPrice?: number }[] = []
   for (const item of lineItems.data) {
     const priceId = item.price?.id
     const qty = item.quantity ?? 1
@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     const photo = await sanityClient.fetch(
       groq`*[_type == "photo" && $priceId in variants[].stripePriceId][0]{
         _id, title, image, editionSize, editionSold,
+        "aspectRatio": image.asset->metadata.dimensions.aspectRatio,
         "variant": variants[stripePriceId == $priceId][0]{ size, frame }
       }`,
       { priceId }
@@ -78,6 +79,8 @@ export async function POST(req: Request) {
       qty,
       imageUrl: photo?.image ? urlFor(photo.image).width(120).height(120).fit('crop').format('jpg').url() : '',
       printFileUrl,
+      orientation: photo?.aspectRatio && photo.aspectRatio > 1 ? 'Horizontal' : 'Vertical',
+      unitPrice: item.price?.unit_amount ?? undefined,
     })
   }
 
@@ -172,16 +175,23 @@ export async function POST(req: Request) {
     frame: i.frame as FulfilmentLine['frame'],
     qty: i.qty,
     printFileUrl: i.printFileUrl,
+    orientation: i.orientation,
+    unitPrice: i.unitPrice,
   }))
   const fulfilmentOrder: FulfilmentOrder = {
     sessionId: session.id,
     region,
     country,
+    currency: (session.currency ?? 'gbp').toUpperCase(),
     customerName,
     customerEmail,
     shippingAddress: addressLines.join(', '),
     addressLines,
+    street1: address?.line1 ?? undefined,
+    street2: address?.line2 ?? undefined,
     city,
+    state: address?.state ?? undefined,
+    zipcode: address?.postal_code ?? undefined,
     total: session.amount_total ?? 0,
     lines,
   }

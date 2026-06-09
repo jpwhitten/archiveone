@@ -1,5 +1,4 @@
 import { unfulfillableReason } from '@/lib/fulfillment/artelo'
-import { ARTELO_SKUS } from '@/lib/fulfillment/artelo-catalog'
 import type { FulfilmentOrder } from '@/lib/fulfillment/types'
 
 function order(overrides: Partial<FulfilmentOrder['lines'][0]> = {}): FulfilmentOrder {
@@ -7,6 +6,7 @@ function order(overrides: Partial<FulfilmentOrder['lines'][0]> = {}): Fulfilment
     sessionId: 'cs_test_123',
     region: 'US',
     country: 'US',
+    currency: 'GBP',
     customerName: 'Sarah M',
     customerEmail: 'sarah@example.com',
     shippingAddress: '14 Park Lane, NY',
@@ -26,18 +26,14 @@ function order(overrides: Partial<FulfilmentOrder['lines'][0]> = {}): Fulfilment
 }
 
 test('returns a reason when a line has no print master', () => {
-  ARTELO_SKUS['A4|Unframed'] = { productId: 'p1', variantId: 'v1' }
-  const reason = unfulfillableReason(order({ printFileUrl: undefined }))
-  expect(reason).toMatch(/master/i)
+  expect(unfulfillableReason(order({ printFileUrl: undefined }))).toMatch(/master/i)
 })
 
-test('returns a reason when a line has no SKU mapping', () => {
-  ARTELO_SKUS['A4|Unframed'] = { productId: '', variantId: '' } // unmapped
-  const reason = unfulfillableReason(order())
-  expect(reason).toMatch(/sku|mapping/i)
+test('returns a reason for an unmapped size', () => {
+  // @ts-expect-error testing an out-of-range size
+  expect(unfulfillableReason(order({ size: 'A9' }))).toMatch(/mapping/i)
 })
 
 test('returns null when every line is mappable and has a master', () => {
-  ARTELO_SKUS['A4|Unframed'] = { productId: 'p1', variantId: 'v1' }
   expect(unfulfillableReason(order())).toBeNull()
 })

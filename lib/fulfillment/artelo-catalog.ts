@@ -1,37 +1,50 @@
 import type { PrintVariant } from '@/lib/types'
 
-export interface ArteloSku {
-  productId: string
-  variantId: string
+// Artelo specifies products by a set of enums (verified live against the API),
+// not arbitrary SKU ids. We sell Individual Art Prints, fine-art archival matte,
+// in oak frames. These maps translate our (size, frame) to Artelo's enum codes.
+
+export const ARTELO_PRODUCT = 'IndividualArtPrint'
+export const ARTELO_PAPER = 'ArchivalMatteFineArt'
+
+// A-series → Artelo size code (decimal-inch with "dot" notation).
+export const ARTELO_SIZE: Record<PrintVariant['size'], string> = {
+  A4: 'x8dot3x11dot7',
+  A3: 'x11dot7x16dot5',
+  A2: 'x16dot5x23dot4',
+  A1: 'x23dot4x33dot1',
 }
 
-// Map our (size, frame) → Artelo catalog identifiers.
-// IDs are filled from the owner's Artelo catalogue (fine-art matte A-sizes × Oak frames).
-// Empty strings = not yet mapped → arteloSkuFor returns null → manual fallback.
-export const ARTELO_SKUS: Record<string, ArteloSku> = {
-  'A4|Unframed': { productId: '', variantId: '' },
-  'A4|Black':    { productId: '', variantId: '' },
-  'A4|White':    { productId: '', variantId: '' },
-  'A4|Natural':  { productId: '', variantId: '' },
-  'A3|Unframed': { productId: '', variantId: '' },
-  'A3|Black':    { productId: '', variantId: '' },
-  'A3|White':    { productId: '', variantId: '' },
-  'A3|Natural':  { productId: '', variantId: '' },
-  'A2|Unframed': { productId: '', variantId: '' },
-  'A2|Black':    { productId: '', variantId: '' },
-  'A2|White':    { productId: '', variantId: '' },
-  'A2|Natural':  { productId: '', variantId: '' },
-  'A1|Unframed': { productId: '', variantId: '' },
-  'A1|Black':    { productId: '', variantId: '' },
-  'A1|White':    { productId: '', variantId: '' },
-  'A1|Natural':  { productId: '', variantId: '' },
+// Our frame label → Artelo frameColor code (oak frames).
+export const ARTELO_FRAME_COLOR: Record<PrintVariant['frame'], string> = {
+  Unframed: 'Unframed',
+  Black: 'BlackOak',
+  White: 'WhiteOak',
+  Natural: 'NaturalOak',
 }
 
-export function arteloSkuFor(
+export interface ArteloItemSpec {
+  catalogProductId: string
+  size: string
+  frameColor: string
+  paperType: string
+}
+
+/**
+ * The Artelo enum spec for a given size+frame, or null if either is unmapped
+ * (an unmapped variant falls back to the manual email flow).
+ */
+export function arteloSpecFor(
   size: PrintVariant['size'],
   frame: PrintVariant['frame']
-): ArteloSku | null {
-  const sku = ARTELO_SKUS[`${size}|${frame}`]
-  if (!sku || !sku.productId || !sku.variantId) return null
-  return sku
+): ArteloItemSpec | null {
+  const sizeCode = ARTELO_SIZE[size]
+  const frameColor = ARTELO_FRAME_COLOR[frame]
+  if (!sizeCode || !frameColor) return null
+  return {
+    catalogProductId: ARTELO_PRODUCT,
+    size: sizeCode,
+    frameColor,
+    paperType: ARTELO_PAPER,
+  }
 }
