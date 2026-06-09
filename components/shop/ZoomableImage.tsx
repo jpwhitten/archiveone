@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 
 interface Props {
@@ -12,6 +13,9 @@ interface Props {
 
 export default function ZoomableImage({ src, fullSrc, alt, blurDataURL }: Props) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -24,6 +28,32 @@ export default function ZoomableImage({ src, fullSrc, alt, blurDataURL }: Props)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
+
+  // Rendered via a portal to <body> so `position: fixed` is relative to the
+  // viewport, not the transformed PageTransition wrapper it's nested inside.
+  const overlay = (
+    <div
+      className="fixed inset-0 z-[70] bg-ink/95 flex items-center justify-center p-4 sm:p-10 cursor-zoom-out"
+      onClick={() => setOpen(false)}
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={fullSrc}
+        alt={alt}
+        className="max-w-full max-h-full object-contain select-none"
+        onClick={e => e.stopPropagation()}
+      />
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="absolute top-5 right-6 text-paper text-xs font-mono tracking-widest uppercase hover:opacity-60 transition-opacity"
+      >
+        ✕ Close
+      </button>
+    </div>
+  )
 
   return (
     <>
@@ -47,28 +77,7 @@ export default function ZoomableImage({ src, fullSrc, alt, blurDataURL }: Props)
         />
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-[70] bg-ink/95 flex items-center justify-center p-4 sm:p-10 cursor-zoom-out"
-          onClick={() => setOpen(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={fullSrc}
-            alt={alt}
-            className="max-w-full max-h-full object-contain select-none"
-          />
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="absolute top-5 right-6 text-paper text-xs font-mono tracking-widest uppercase hover:opacity-60 transition-opacity"
-          >
-            ✕ Close
-          </button>
-        </div>
-      )}
+      {open && mounted && createPortal(overlay, document.body)}
     </>
   )
 }
