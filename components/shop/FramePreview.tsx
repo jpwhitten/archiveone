@@ -67,6 +67,10 @@ export default function FramePreview({ image, size, frame, aspectRatio }: Props)
   const m = moulding(frame)
   const isUnframed = frame === 'Unframed'
   const matPad = isUnframed ? 11 : 22
+  const mouldPad = m ? 15 : 0
+
+  // Ideal block width at this size; capped to the container on narrow screens.
+  const blockWidth = imgWidth + 2 * (matPad + mouldPad)
 
   // Directional cast shadow so the frame sits on the wall and catches light.
   const dropShadow = m
@@ -75,7 +79,7 @@ export default function FramePreview({ image, size, frame, aspectRatio }: Props)
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center min-h-[480px] overflow-hidden px-6 py-12"
+      className="relative flex flex-col items-center justify-center min-h-[360px] sm:min-h-[480px] overflow-hidden px-6 py-12"
       // Soft gallery wall with a subtle floor line ~70% down.
       style={{
         background:
@@ -86,17 +90,19 @@ export default function FramePreview({ image, size, frame, aspectRatio }: Props)
         className="transition-all duration-300"
         style={{
           ...(m ?? {}),
+          boxSizing: 'border-box',
+          width: `min(${blockWidth}px, 100%)`,
           boxShadow: m ? `${m.boxShadow as string}, ${dropShadow}` : dropShadow,
         }}
       >
         {/* Mat / mount (or thin paper margin when unframed) */}
-        <div style={{ background: '#fcfbf9', padding: matPad }}>
+        <div style={{ background: '#fcfbf9', padding: matPad, boxSizing: 'border-box' }}>
           {/* Print window — recessed below the mat for framed options */}
           <div
             className="relative"
             style={{
-              width: imgWidth,
-              height: imgHeight,
+              width: '100%',
+              aspectRatio: `${imgWidth} / ${imgHeight}`,
               boxShadow: isUnframed
                 ? 'inset 0 0 0 1px rgba(0,0,0,0.05)'
                 : 'inset 0 3px 7px -2px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(0,0,0,0.06)',
