@@ -35,3 +35,14 @@ test('arteloSpecFor returns null for an unmapped size', () => {
   // @ts-expect-error testing an out-of-range size
   expect(arteloSpecFor('A9', 'Black')).toBeNull()
 })
+
+test('square sizes map to Artelo square codes', () => {
+  expect(ARTELO_SIZE['20×20']).toBe('x8x8')
+  expect(ARTELO_SIZE['50×50']).toBe('x20x20')
+  expect(arteloSpecFor('30×30', 'Natural')).toEqual({
+    catalogProductId: ARTELO_PRODUCT,
+    size: 'x12x12',
+    frameColor: 'NaturalOak',
+    paperType: ARTELO_PAPER,
+  })
+})

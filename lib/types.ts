@@ -6,7 +6,7 @@ export interface SanityImage {
 
 export interface PrintVariant {
   _key: string
-  size: 'A4' | 'A3' | 'A2' | 'A1'
+  size: 'A4' | 'A3' | 'A2' | 'A1' | '20×20' | '30×30' | '40×40' | '50×50'
   frame: 'Unframed' | 'Black' | 'White' | 'Natural'
   price: number
   stripePriceId: string

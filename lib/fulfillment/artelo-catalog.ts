@@ -13,6 +13,10 @@ export const ARTELO_SIZE: Record<PrintVariant['size'], string> = {
   A3: 'x11dot7x16dot5',
   A2: 'x16dot5x23dot4',
   A1: 'x23dot4x33dot1',
+  '20×20': 'x8x8',
+  '30×30': 'x12x12',
+  '40×40': 'x16x16',
+  '50×50': 'x20x20',
 }
 
 // Our frame label → Artelo frameColor code (oak frames).

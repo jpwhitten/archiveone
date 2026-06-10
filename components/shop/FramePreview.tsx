@@ -16,6 +16,10 @@ const SIZE_MAX: Record<PrintVariant['size'], number> = {
   A3: 225,
   A2: 270,
   A1: 315,
+  '20×20': 170,
+  '30×30': 215,
+  '40×40': 260,
+  '50×50': 305,
 }
 
 // Physical paper dimensions for the scale caption.
@@ -24,6 +28,10 @@ const SIZE_CM: Record<PrintVariant['size'], string> = {
   A3: '30 × 42 cm',
   A2: '42 × 59 cm',
   A1: '59 × 84 cm',
+  '20×20': '20 × 20 cm',
+  '30×30': '30 × 30 cm',
+  '40×40': '40 × 40 cm',
+  '50×50': '50 × 50 cm',
 }
 
 // Moulding (outer frame profile) per frame option. null = unframed.
