@@ -6,7 +6,7 @@ import { useCart } from '@/components/cart/CartContext'
 import { cartItemKey } from '@/lib/types'
 import type { Photo, PrintVariant } from '@/lib/types'
 
-const SIZES: PrintVariant['size'][] = ['A4', 'A3', 'A2', 'A1']
+const SIZES: PrintVariant['size'][] = ['A4', 'A3', 'A2', 'A1', '20×20', '30×30', '40×40', '50×50']
 const FRAMES: PrintVariant['frame'][] = ['Unframed', 'Black', 'White', 'Natural']
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function PrintSelector({ photo }: Props) {
-  const [size, setSize] = useState<PrintVariant['size']>('A3')
+  const [size, setSize] = useState<PrintVariant['size']>(photo.variants?.[0]?.size ?? 'A4')
   const [frame, setFrame] = useState<PrintVariant['frame']>('Unframed')
   const { addItem, openCart, items } = useCart()
 
