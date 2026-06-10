@@ -124,7 +124,7 @@ export default function FramePreview({ image, size, frame, aspectRatio }: Props)
       </div>
 
       <p className="mt-7 text-[11px] font-mono tracking-widest uppercase text-ink/40">
-        Shown at {size} · {SIZE_CM[size]}
+        Shown at {SQUARE_SIZES.has(size) ? SIZE_CM[size] : `${size} · ${SIZE_CM[size]}`}
       </p>
     </div>
   )
