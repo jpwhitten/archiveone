@@ -34,6 +34,8 @@ const SIZE_CM: Record<PrintVariant['size'], string> = {
   '50×50': '50 × 50 cm',
 }
 
+const SQUARE_SIZES = new Set<PrintVariant['size']>(['20×20', '30×30', '40×40', '50×50'])
+
 // Moulding (outer frame profile) per frame option. null = unframed.
 // The inset box-shadow gives each frame a bevel so it reads as a real profile.
 function moulding(frame: PrintVariant['frame']): React.CSSProperties | null {
@@ -66,8 +68,8 @@ function moulding(frame: PrintVariant['frame']): React.CSSProperties | null {
 export default function FramePreview({ image, size, frame, aspectRatio }: Props) {
   const src = urlFor(image).width(800).quality(90).auto('format').url()
 
-  // width / height. > 1 = landscape, < 1 = portrait. Default to square if unknown.
-  const ratio = aspectRatio && aspectRatio > 0 ? aspectRatio : 1
+  // Square sizes print 1:1 regardless of the photo's exact ratio; otherwise follow the photo.
+  const ratio = SQUARE_SIZES.has(size) ? 1 : aspectRatio && aspectRatio > 0 ? aspectRatio : 1
   const max = SIZE_MAX[size]
   const imgWidth = ratio >= 1 ? max : Math.round(max * ratio)
   const imgHeight = ratio >= 1 ? Math.round(max / ratio) : max
