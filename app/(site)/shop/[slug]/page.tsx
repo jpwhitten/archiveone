@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getPhotoBySlug, getAllPhotos, getRelatedPhotos } from '@/lib/sanity/queries'
 import { urlFor } from '@/lib/sanity/image'
 import PrintSelector from '@/components/shop/PrintSelector'
+import PrintDetails from '@/components/shop/PrintDetails'
 import SizeGuide from '@/components/shop/SizeGuide'
 import ProductCard from '@/components/shop/ProductCard'
 import ZoomableImage from '@/components/shop/ZoomableImage'
@@ -121,6 +122,7 @@ export default async function PrintPage({ params }: Props) {
         {isForSale ? (
           <>
             <PrintSelector photo={photo} />
+            <PrintDetails limitedEdition={photo.editionSize != null} />
             <details className="mt-8 border-t border-ink/10 pt-6 group">
               <summary className="text-xs font-mono tracking-widest uppercase text-ink/40 cursor-pointer select-none hover:text-ink transition-colors">
                 Size guide
