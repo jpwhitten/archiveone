@@ -34,6 +34,15 @@ const PRICING = {
 const SIZES = ['A4', 'A3', 'A2', 'A1']
 const FRAMES = ['Unframed', 'Black', 'White', 'Natural']
 
+// Square-format prices (GBP pence). Square photos sell these instead of A-series.
+const SQUARE_PRICING = {
+  '20×20': { Unframed: 4500, Black: 9000, White: 9000, Natural: 9500 },
+  '30×30': { Unframed: 5500, Black: 10500, White: 10500, Natural: 11000 },
+  '40×40': { Unframed: 7500, Black: 14500, White: 14500, Natural: 15000 },
+  '50×50': { Unframed: 9500, Black: 18000, White: 18000, Natural: 18500 },
+}
+const SQUARE_SIZES = ['20×20', '30×30', '40×40', '50×50']
+
 // ---- Load .env.local (this is a standalone script, not run by Next.js) ----
 function loadEnv() {
   try {
@@ -83,7 +92,7 @@ const gbp = pence => `£${(pence / 100).toFixed(2)}`
 async function main() {
   // 1. Find the photo in Sanity
   const photo = await sanity.fetch(
-    `*[_type == "photo" && slug.current == $slug][0]{ _id, title, "slug": slug.current }`,
+    `*[_type == "photo" && slug.current == $slug][0]{ _id, title, "slug": slug.current, "aspectRatio": image.asset->metadata.dimensions.aspectRatio }`,
     { slug }
   )
   if (!photo) {
@@ -93,11 +102,15 @@ async function main() {
 
   console.log(`\nPhoto: ${photo.title}  (${photo.slug})`)
   console.log(dryRun ? '(dry run — no changes will be made)\n' : '')
+  const isSquare = photo.aspectRatio != null && Math.abs(photo.aspectRatio - 1) <= 0.06
+  const sizes = isSquare ? SQUARE_SIZES : SIZES
+  const priceMatrix = isSquare ? SQUARE_PRICING : PRICING
+  console.log(`Format: ${isSquare ? 'square' : 'A-series'}\n`)
 
   if (dryRun) {
-    for (const size of SIZES) {
+    for (const size of sizes) {
       for (const frame of FRAMES) {
-        console.log(`  ${size} · ${frame.padEnd(8)} → ${gbp(PRICING[size][frame])}`)
+        console.log(`  ${size} · ${frame.padEnd(8)} → ${gbp(priceMatrix[size][frame])}`)
       }
     }
     console.log('\nRun without --dry to create Stripe prices and update Sanity.')
@@ -128,9 +141,9 @@ async function main() {
 
   // 3. Create/reuse a price per variant
   const variants = []
-  for (const size of SIZES) {
+  for (const size of sizes) {
     for (const frame of FRAMES) {
-      const amount = PRICING[size][frame]
+      const amount = priceMatrix[size][frame]
       const lookupKey = `${slug}-${size}-${frame}`.toLowerCase().replace(/[^a-z0-9-]/g, '')
 
       const existing = await stripe.prices.list({ lookup_keys: [lookupKey], limit: 1 })
