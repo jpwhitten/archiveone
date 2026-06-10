@@ -35,7 +35,7 @@ export default function Nav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 bg-paper">
       <Link href="/" className="flex items-center" aria-label="Archive Nº1 — home">
-        {/* Full lockup on desktop */}
+        {/* Full logo + wordmark lockup at all sizes (smaller on mobile) */}
         <Image
           src="/Archive1-logo.png"
           alt="Archive Nº1"
@@ -43,17 +43,7 @@ export default function Nav() {
           height={200}
           priority
           unoptimized
-          className="hidden md:block h-[66px] w-auto"
-        />
-        {/* Square mark on mobile */}
-        <Image
-          src="/Archive1-logo-mobile.png"
-          alt="Archive Nº1"
-          width={200}
-          height={200}
-          priority
-          unoptimized
-          className="md:hidden h-11 w-auto"
+          className="h-9 md:h-[66px] w-auto"
         />
       </Link>
 
@@ -104,12 +94,12 @@ export default function Nav() {
         <div className="fixed inset-0 z-[60] bg-paper flex flex-col md:hidden">
           <div className="flex items-center justify-between px-6 py-5">
             <Image
-              src="/Archive1-logo-mobile.png"
+              src="/Archive1-logo.png"
               alt="Archive Nº1"
-              width={200}
+              width={800}
               height={200}
               unoptimized
-              className="h-11 w-auto"
+              className="h-9 w-auto"
             />
             <button
               onClick={() => setMenuOpen(false)}
