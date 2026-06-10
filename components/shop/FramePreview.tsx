@@ -9,13 +9,50 @@ interface Props {
   aspectRatio?: number
 }
 
-// Longest edge of the photo (px) for each print size, so larger prints
-// render visibly bigger in the preview.
+// Longest edge of the photo (px) per print size, so larger prints render
+// visibly bigger in the preview.
 const SIZE_MAX: Record<PrintVariant['size'], number> = {
-  A4: 190,
-  A3: 240,
-  A2: 290,
-  A1: 340,
+  A4: 180,
+  A3: 225,
+  A2: 270,
+  A1: 315,
+}
+
+// Physical paper dimensions for the scale caption.
+const SIZE_CM: Record<PrintVariant['size'], string> = {
+  A4: '21 × 30 cm',
+  A3: '30 × 42 cm',
+  A2: '42 × 59 cm',
+  A1: '59 × 84 cm',
+}
+
+// Moulding (outer frame profile) per frame option. null = unframed.
+// The inset box-shadow gives each frame a bevel so it reads as a real profile.
+function moulding(frame: PrintVariant['frame']): React.CSSProperties | null {
+  switch (frame) {
+    case 'Black':
+      return {
+        padding: 15,
+        background: 'linear-gradient(135deg, #2c2c2c, #090909)',
+        boxShadow: 'inset 2px 2px 2px rgba(255,255,255,0.14), inset -2px -2px 3px rgba(0,0,0,0.7)',
+      }
+    case 'White':
+      return {
+        padding: 15,
+        background: 'linear-gradient(135deg, #ffffff, #ececec)',
+        boxShadow:
+          'inset 2px 2px 2px rgba(255,255,255,0.9), inset -2px -2px 3px rgba(0,0,0,0.12), 0 0 0 1px #e3e1dc',
+      }
+    case 'Natural':
+      return {
+        padding: 15,
+        background:
+          'repeating-linear-gradient(91deg, rgba(120,80,30,0) 0px, rgba(120,80,30,0.09) 2px, rgba(120,80,30,0) 5px), linear-gradient(135deg, #ddc197, #bf9d62)',
+        boxShadow: 'inset 2px 2px 2px rgba(255,255,255,0.32), inset -2px -2px 3px rgba(90,60,20,0.45)',
+      }
+    default:
+      return null
+  }
 }
 
 export default function FramePreview({ image, size, frame, aspectRatio }: Props) {
@@ -27,27 +64,52 @@ export default function FramePreview({ image, size, frame, aspectRatio }: Props)
   const imgWidth = ratio >= 1 ? max : Math.round(max * ratio)
   const imgHeight = ratio >= 1 ? Math.round(max / ratio) : max
 
-  const frameStyle: React.CSSProperties = frame === 'Black'
-    ? { border: '18px solid #0A0A0A', padding: 12, background: 'white', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }
-    : frame === 'White'
-    ? { border: '18px solid #FFFFFF', padding: 12, background: 'white', outline: '1px solid #e5e7eb', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }
-    : frame === 'Natural'
-    ? { border: '18px solid #C8A96E', padding: 12, background: 'white', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }
-    : { boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }
+  const m = moulding(frame)
+  const isUnframed = frame === 'Unframed'
+  const matPad = isUnframed ? 11 : 22
+
+  // Directional cast shadow so the frame sits on the wall and catches light.
+  const dropShadow = m
+    ? '16px 30px 45px -18px rgba(40,30,15,0.42), 4px 9px 14px -6px rgba(0,0,0,0.28)'
+    : '12px 26px 40px -18px rgba(40,30,15,0.32), 3px 7px 12px -6px rgba(0,0,0,0.2)'
 
   return (
-    <div className="flex items-center justify-center bg-mist p-12 min-h-[420px]">
-      <div className="transition-all duration-300" style={frameStyle}>
-        <div className="relative" style={{ width: imgWidth, height: imgHeight }}>
-          <Image
-            src={src}
-            alt="Print preview"
-            fill
-            className="object-cover"
-            sizes="400px"
-          />
+    <div
+      className="relative flex flex-col items-center justify-center min-h-[480px] overflow-hidden px-6 py-12"
+      // Soft gallery wall with a subtle floor line ~70% down.
+      style={{
+        background:
+          'linear-gradient(180deg, #f5f3f0 0%, #efece8 70%, #e7e3dd 70.3%, #e2ddd6 100%)',
+      }}
+    >
+      <div
+        className="transition-all duration-300"
+        style={{
+          ...(m ?? {}),
+          boxShadow: m ? `${m.boxShadow as string}, ${dropShadow}` : dropShadow,
+        }}
+      >
+        {/* Mat / mount (or thin paper margin when unframed) */}
+        <div style={{ background: '#fcfbf9', padding: matPad }}>
+          {/* Print window — recessed below the mat for framed options */}
+          <div
+            className="relative"
+            style={{
+              width: imgWidth,
+              height: imgHeight,
+              boxShadow: isUnframed
+                ? 'inset 0 0 0 1px rgba(0,0,0,0.05)'
+                : 'inset 0 3px 7px -2px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(0,0,0,0.06)',
+            }}
+          >
+            <Image src={src} alt="Print preview" fill className="object-cover" sizes="400px" />
+          </div>
         </div>
       </div>
+
+      <p className="mt-7 text-[11px] font-mono tracking-widest uppercase text-ink/40">
+        Shown at {size} · {SIZE_CM[size]}
+      </p>
     </div>
   )
 }
