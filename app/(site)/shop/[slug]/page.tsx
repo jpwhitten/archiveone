@@ -40,6 +40,8 @@ export default async function PrintPage({ params }: Props) {
   if (!photo) notFound()
 
   const soldOut = isSoldOut()
+  const squareSizes = ['20×20', '30×30', '40×40', '50×50']
+  const isSquarePrint = photo.variants?.some(v => squareSizes.includes(v.size)) ?? false
   const isForSale = !soldOut && photo.forSale && (photo.variants?.length ?? 0) > 0
   const mainSrc = urlFor(photo.image).width(1800).quality(90).auto('format').url()
   const related = await getRelatedPhotos(
@@ -128,7 +130,7 @@ export default async function PrintPage({ params }: Props) {
                 Size guide
               </summary>
               <div className="mt-5">
-                <SizeGuide />
+                <SizeGuide square={isSquarePrint} />
               </div>
             </details>
           </>
